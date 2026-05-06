@@ -338,10 +338,6 @@ body { display: flex; justify-content: center; }
 .task-check:hover { border-color: #34C759; }
 .task-check.done { background: #34C759; border-color: #34C759; }
 .task-check.done::after { content: '✓'; font-size: 11px; color: #fff; font-weight: 700; }
-.priority-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 600; white-space: nowrap; align-self: flex-start; margin-top: 2px; }
-.p-high { background: #FF3B30; color: #fff; }
-.p-med  { background: #FF9500; color: #fff; }
-.p-low  { background: #34C759; color: #fff; }
 .event-drag { font-size: 14px; color: var(--text-tertiary); cursor: grab; padding: 0 2px; align-self: center; user-select: none; }
 .event-drag:active { cursor: grabbing; }
 .del-btn { position: absolute; right: 8px; top: 8px; background: none; border: none; cursor: pointer; color: var(--text-tertiary); font-size: 13px; display: none; line-height: 1; padding: 2px 4px; border-radius: 4px; }
@@ -501,15 +497,6 @@ body { display: flex; justify-content: center; }
       </div>
     </div>
     <div class="field"><label>Date</label><input id="f-date" type="date" /></div>
-    <div class="field" id="f-priority-wrap" style="display:none">
-      <label>Priority</label>
-      <select id="f-priority">
-        <option value="none">None</option>
-        <option value="high">High</option>
-        <option value="med">Medium</option>
-        <option value="low">Low</option>
-      </select>
-    </div>
     <div class="field"><label>Calendar</label><select id="f-cal"></select></div>
     <div class="field"><label>Color label</label><div class="color-row" id="color-row"></div></div>
     <div class="field"><label>Notes</label><textarea id="f-notes" placeholder="Add notes…"></textarea></div>
@@ -854,11 +841,6 @@ function makeCard(item) {
   const calObj = calendars.find(c => c.id === item.calendar);
   if (calObj) { const ce = document.createElement('div'); ce.className = 'event-cal'; ce.textContent = calObj.name; info.appendChild(ce); }
   card.appendChild(info);
-  if (item.priority && item.priority !== 'none') {
-    const pb = document.createElement('span'); pb.className = 'priority-badge p-' + item.priority;
-    pb.textContent = item.priority === 'high' ? 'High' : item.priority === 'med' ? 'Med' : 'Low';
-    card.appendChild(pb);
-  }
   const del = document.createElement('button'); del.className = 'del-btn'; del.textContent = '✕';
   del.addEventListener('click', e => { e.stopPropagation(); deleteItem(item.id); });
   card.appendChild(del);
@@ -953,7 +935,6 @@ function openModal(item = null) {
   document.getElementById('f-end').value              = item && item.end      ? item.end      : '10:00';
   document.getElementById('f-date').value             = item && item.date     ? item.date     : dateKey(selectedDate);
   document.getElementById('f-notes').value            = item && item.notes    ? item.notes    : '';
-  document.getElementById('f-priority').value         = item && item.priority ? item.priority : 'none';
   document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === itemType));
   updateTypeUI();
   buildColorRow('color-row', selectedColor, c => { selectedColor = c; });
@@ -963,7 +944,6 @@ function openModal(item = null) {
   setTimeout(() => document.getElementById('f-title').focus(), 50);
 }
 function updateTypeUI() {
-  document.getElementById('f-priority-wrap').style.display = (itemType === 'task' || itemType === 'reminder') ? '' : 'none';
   document.getElementById('f-time-wrap').style.display     = itemType === 'reminder' ? 'none' : '';
 }
 function closeModal() { document.getElementById('modal-bg').classList.remove('open'); editingId = null; }
@@ -973,7 +953,6 @@ function saveModal() {
   const end      = document.getElementById('f-end').value;
   const dateStr  = document.getElementById('f-date').value;
   const notes    = document.getElementById('f-notes').value.trim();
-  const priority = document.getElementById('f-priority').value;
   const calendar = document.getElementById('f-cal').value;
   let existingDone = false;
   if (editingId) {
@@ -982,7 +961,7 @@ function saveModal() {
       if (idx >= 0) { existingDone = arr[idx].done || false; arr.splice(idx,1); if (!arr.length) delete data[k]; else data[k] = arr; }
     });
   }
-  const item = { id: editingId || uid(), title, start, end, date: dateStr, notes, priority, calendar, color: selectedColor, type: itemType, done: editingId ? existingDone : false };
+  const item = { id: editingId || uid(), title, start, end, date: dateStr, notes, calendar, color: selectedColor, type: itemType, done: editingId ? existingDone : false };
   const td = parseLocalDateTime(dateStr); const items = getItems(td); items.push(item); setItems(td, items);
   closeModal(); renderAll();
 }
