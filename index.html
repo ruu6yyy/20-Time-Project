@@ -963,7 +963,7 @@ function openModal(item = null) {
   setTimeout(() => document.getElementById('f-title').focus(), 50);
 }
 function updateTypeUI() {
-  document.getElementById('f-priority-wrap').style.display = itemType === 'task'     ? '' : 'none';
+  document.getElementById('f-priority-wrap').style.display = (itemType === 'task' || itemType === 'reminder') ? '' : 'none';
   document.getElementById('f-time-wrap').style.display     = itemType === 'reminder' ? 'none' : '';
 }
 function closeModal() { document.getElementById('modal-bg').classList.remove('open'); editingId = null; }
