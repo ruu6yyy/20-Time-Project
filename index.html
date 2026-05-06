@@ -616,10 +616,10 @@ function parseLocalDateTime(dateStr, timeStr = '00:00') {
 
 // ── Progress for a day ────────────────────────────────────────
 function dayProgress(d) {
-  const tasks = getItems(d).filter(i => i.type === 'task');
-  if (!tasks.length) return { total:0, done:0, pct:0 };
-  const done = tasks.filter(i => i.done).length;
-  return { total: tasks.length, done, pct: Math.round(done / tasks.length * 100) };
+  const items = getItems(d).filter(i => i.type === 'task' || i.type === 'reminder');
+  if (!items.length) return { total:0, done:0, pct:0 };
+  const done = items.filter(i => i.done).length;
+  return { total: items.length, done, pct: Math.round(done / items.length * 100) };
 }
 
 // ── Digital Clock ─────────────────────────────────────────────
@@ -804,8 +804,8 @@ function renderDayProgress() {
   bar.className   = p.pct === 100 ? 'full' : p.pct > 0 ? 'partial' : '';
   document.getElementById('day-prog-pct').textContent = p.pct + '%';
   document.getElementById('day-prog-sub').textContent = p.total > 0
-    ? p.done + ' of ' + p.total + ' task' + (p.total === 1 ? '' : 's') + ' completed'
-    : 'No tasks for this day';
+    ? p.done + ' of ' + p.total + ' item' + (p.total === 1 ? '' : 's') + ' completed'
+    : 'No tasks or reminders for this day';
 }
 
 // ── Day view ──────────────────────────────────────────────────
